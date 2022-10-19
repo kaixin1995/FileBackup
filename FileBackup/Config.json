@@ -1,6 +1,6 @@
 {
-  "Host": "192.168.3.150",
-  "Port": "2121",
+  "Host": "127.0.0.1",
+  "Port": "21",
   "UserName": "admin",
-  "PassWord": "QAZxdr358"
+  "PassWord": "123456"
 }
