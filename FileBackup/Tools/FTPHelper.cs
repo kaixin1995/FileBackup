@@ -146,6 +146,7 @@ namespace FileBackup.Tools
         /// <summary>
         /// 删除超时备份
         /// </summary>
+        /// 注意：此处我的FTP存放地是\FTPData  请根据你的实际情况进行修改
         /// <param name="name"></param>
         /// <param name="count"></param>
         public void DelTheBackup(string name,int count)
@@ -155,6 +156,8 @@ namespace FileBackup.Tools
             {
                 conn.Connect();
 
+                /* 注意：此处我的FTP存放地是\FTPData  请根据你的实际情况进行修改 */
+
                 //不存在该目录就退出
                 if (!conn.DirectoryExists($"\\FTPData\\{name}"))
                 {
@@ -162,8 +165,6 @@ namespace FileBackup.Tools
                 }
                 foreach (var s in conn.GetNameListing($"\\FTPData\\{name}"))
                 {
-                    // load some information about the object
-                    // returned from the listing...
                     var isDirectory = conn.DirectoryExists(s);
                     var modify = conn.GetModifiedTime(s);
                     var size = isDirectory ? 0 : conn.GetFileSize(s);
