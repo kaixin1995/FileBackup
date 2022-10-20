@@ -1,4 +1,9 @@
-﻿using ICSharpCode.SharpZipLib.Zip;
+﻿using FileBackup.Implements;
+using FileBackup.Interfaces;
+using ICSharpCode.SharpZipLib.Zip;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 using System.IO;
 using System.Xml.Linq;
 
@@ -7,13 +12,17 @@ namespace FileBackup.Tools
     /// <summary>
     /// 压缩帮助类
     /// </summary>
-    public static class ZipHelper
+    public class ZipHelper
     {
 
-        static ZipHelper()
+        public ZipHelper(ILog _log)
         {
+            this._log = _log;
             CreateAFolder();
         }
+
+        private readonly ILog _log;
+
 
         /// <summary>
         /// 多文件压缩备份
@@ -21,7 +30,7 @@ namespace FileBackup.Tools
         /// <param name="name"></param>
         /// <param name="files"></param>
         /// <returns></returns>
-        public static string MulFileCompression(string name,List<string> files)
+        public string MulFileCompression(string name,List<string> files)
         {
             try
             {
@@ -39,7 +48,7 @@ namespace FileBackup.Tools
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"多文件压缩备份:{ex.Message}");
+                _log.Error($"多文件压缩备份:{ex.Message}");
                 return "";
             }
         }
@@ -51,7 +60,7 @@ namespace FileBackup.Tools
         /// <param name="name">压缩目录名</param>
         /// <param name="filepath">被压缩的目录</param>
         /// <returns></returns>
-        public static string DirCompression(string name, string path)
+        public string DirCompression(string name, string path)
         {
             try
             {
@@ -61,7 +70,7 @@ namespace FileBackup.Tools
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"目录压缩:{ex.Message}");
+                _log.Error($"目录压缩:{ex.Message}");
                 return "";
             }
         }
@@ -83,7 +92,7 @@ namespace FileBackup.Tools
         /// <param name="name"></param>
         /// <param name="filepath"></param>
         /// <returns></returns>
-        public static string FileCompression(string name, string filepath)
+        public string FileCompression(string name, string filepath)
         {
             try
             {
@@ -95,11 +104,12 @@ namespace FileBackup.Tools
                     zip.Add(filepath);
                     zip.CommitUpdate();
                 }
+                _log.Info($"文件压缩完成，地址为:{_filepath}");
                 return _filepath;
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"文件压缩:{ex.Message}");
+                _log.Error($"文件压缩:{ex.Message}");
                 return "";
             }
         }
@@ -111,7 +121,7 @@ namespace FileBackup.Tools
         /// <param name="zippath"></param>
         /// <param name="files"></param>
         /// <returns></returns>
-        public static bool ZipAddFile(string zippath,List<string> files)
+        public bool ZipAddFile(string zippath,List<string> files)
         {
             try
             {
@@ -128,7 +138,7 @@ namespace FileBackup.Tools
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"给压缩包中增加文件:{ex.Message}");
+                _log.Error($"给压缩包中增加文件:{ex.Message}");
                 return false;
             }
         }
@@ -140,7 +150,7 @@ namespace FileBackup.Tools
         /// <param name="zippath"></param>
         /// <param name="filepath"></param>
         /// <returns></returns>
-        public static bool UnzipTheFiles(string zippath, string filepath)
+        public bool UnzipTheFiles(string zippath, string filepath)
         {
             try
             {
@@ -149,7 +159,7 @@ namespace FileBackup.Tools
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"解压压缩包到指定目录:{ex.Message}");
+                _log.Error($"解压压缩包到指定目录:{ex.Message}");
                 return false;
             }
         }

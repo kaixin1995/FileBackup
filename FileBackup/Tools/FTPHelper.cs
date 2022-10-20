@@ -1,21 +1,24 @@
-﻿using FileBackup.Models;
+﻿using FileBackup.Interfaces;
+using FileBackup.Models;
 using FluentFTP;
 using Newtonsoft.Json;
 using System.Text;
 
 namespace FileBackup.Tools
 {
-    public static class FTPHelper
+    public class FTPHelper
     {
-        public static FtpClient _ftpClient {get;set;}
+        public FtpClient _ftpClient {get;set;}
 
-        static FTPHelper()
+        private readonly ILog _log;
+        public FTPHelper(ILog _log)
         {
+            this._log = _log;
             InitThe();
         }
 
 
-        public static void InitThe()
+        public void InitThe()
         {
             StreamReader sr = new StreamReader($"{UniversalTool.RunDir}Config.json");
             string content = sr.ReadToEnd();
@@ -40,7 +43,7 @@ namespace FileBackup.Tools
         /// <summary>
         /// 更新FTP的配置文件
         /// </summary>
-        public static void UpdateConfig()
+        public void UpdateConfig()
         {
             Console.Write("请输入FTP的IP：");
             string ip=Console.ReadLine();
@@ -80,9 +83,9 @@ namespace FileBackup.Tools
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"配置更新时将会变更此方法:{ex.Message}");
+                _log.Error($"配置更新时将会变更此方法:{ex.Message}");
             }
-            LogHelper.Info($"FTP配置更新成功！");
+            _log.Info($"FTP配置更新成功！");
             InitThe();
         }
 
@@ -90,7 +93,7 @@ namespace FileBackup.Tools
         /// <summary>
         /// 登录
         /// </summary>
-        public static void Login()
+        public void Login()
         {
             try
             {
@@ -106,13 +109,13 @@ namespace FileBackup.Tools
                         _ftpClient.Encoding = Encoding.GetEncoding("ISO-8859-1");
                     }
 
-                    LogHelper.Info($"FTP登录成功");
+                    _log.Info($"FTP登录成功");
 
                 }
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"FTP登录:{ex.Message}");
+                _log.Error($"FTP登录:{ex.Message}");
             }
         }
 
@@ -121,7 +124,7 @@ namespace FileBackup.Tools
         /// </summary>
         /// <param name="sourcePath">文件源路径</param>
         /// <param name="destPath">上传到指定的ftp文件夹路径</param>
-        public static void UploadFile(string sourcePath, string destPath)
+        public void UploadFile(string sourcePath, string destPath)
         {
             try
             {
@@ -131,11 +134,11 @@ namespace FileBackup.Tools
                 var fileInfo = new FileInfo(sourcePath);
                 //LogHelper.Info($"destPath:{destPath}       fileInfo.Name:{fileInfo.Name}");
                 _ftpClient.UploadFile(sourcePath, $"{destPath}/{fileInfo.Name}", createRemoteDir: true);
-                LogHelper.Info($"FTP:{sourcePath}上传到{destPath}/{fileInfo.Name}");
+                _log.Info($"FTP:{sourcePath}上传到{destPath}/{fileInfo.Name}");
             }
             catch (Exception ex)
             {
-                LogHelper.Error($"FTP上传单个文件:{ex.Message}");
+                _log.Error($"FTP上传单个文件:{ex.Message}");
             }
         }
 
@@ -145,7 +148,7 @@ namespace FileBackup.Tools
         /// </summary>
         /// <param name="name"></param>
         /// <param name="count"></param>
-        public static void DelTheBackup(string name,int count)
+        public void DelTheBackup(string name,int count)
         {
             Login();
             using (var conn = _ftpClient)
@@ -167,7 +170,7 @@ namespace FileBackup.Tools
                     if (UniversalTool.DateDiff(modify, DateTime.Now) > count)
                     {
                         conn.DeleteFile(s);
-                        LogHelper.Info($"FTP删除文件:{s}");
+                        _log.Info($"FTP删除文件:{s}");
                     }
                 }
             }
