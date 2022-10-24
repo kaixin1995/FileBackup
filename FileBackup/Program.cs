@@ -81,6 +81,9 @@ using (ServiceProvider serviceProvider = services.BuildServiceProvider())
                 break;
             case "7":
                 return;
+                default:
+                Console.WriteLine("输入值错误，请按照序号进行正确输入！\n");
+                break;
         }
 
     }
